@@ -8,12 +8,12 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "3310:3307"
+      - "3307:3306"
     volumes:
       - ./init:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_DATABASE: "express"
+      MYSQL_DATABASE: "we_transfer"
 
   backend:
     build:
