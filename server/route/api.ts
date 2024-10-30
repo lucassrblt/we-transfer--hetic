@@ -1,9 +1,12 @@
 import express from "express";
-import {getAll, getOne, postThings} from "../controller/api_controller";
+import {getAll, getOne, postThings, createToken} from "../controller/api_controller";
+import {login} from "../controller/user";
 import {checkSchema} from "express-validator";
 import {user_schema} from "../schema/user_schema";
 import {TodoRepositoryI} from "../type/todo";
 import {App} from "../type/app";
+import jwt from "jsonwebtoken";
+
 
 export function getRoutes(app: App) {
     const router = express.Router()
@@ -19,6 +22,9 @@ export function getRoutes(app: App) {
     // })
 
     router.get('/', getAll(app))
+
+    router.get('/api', createToken())
+    router.get('/api/login', login)
 
     router.post('/', checkSchema(user_schema), postThings())
 
