@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 
 dotenv.config();
 
-const KEY = process.env.RANDOM_KEY as string;
+const KEY = process.env.SECRET_KEY as string;
 
 interface SignupRequest extends Request {
     body: {
@@ -47,23 +47,29 @@ export async function signup(req: SignupRequest, res: Response, next: NextFuncti
 }
 
 export async function login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
+      
     try {
         // const user = await userDatabase.getOneUser({
         //     where: {
         //         email: req.body.email
         //     }});
     
+       
+        // const userDataPassword = req.body.password;
+
         const user =  {
             uuid: "123456",
             email: "test@test.com",
-            password:await bcrypt.hash("123456", 10)
-        }   
+            password: await bcrypt.hash("123456", 10)
+        } 
     
-        if (user) {
+        if (user && user.email === req.body.email) {
             const valid = await bcrypt.compare(req.body.password, user.password);
+            console.log(valid);
             if (!valid) {
-                res.status(401).json({ message: 'Incorrect email or password' });
+                res.status(401).json({ message: 'Incorrect email or password', data: req.body.password, userPassword: user.password});
             } else {
+
                 res.status(201).json({
                     userId: user.uuid,
                     token: jwt.sign(
@@ -77,6 +83,6 @@ export async function login(req: LoginRequest, res: Response, next: NextFunction
             res.status(401).json({ message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).json({ error, data: req.body.email});
     }
 }
