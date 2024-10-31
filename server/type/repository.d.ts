@@ -1,5 +1,5 @@
-import {TodoRepositoryI} from "./todo";
+import {FileRepositoryI} from "./todo";
 
 export interface Repository {
-    todoRepository: TodoRepositoryI
+    filesRepository: FileRepositoryI
 }
