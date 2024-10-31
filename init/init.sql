@@ -4,6 +4,7 @@ USE `we_transfer`;
 
 CREATE TABLE users (
     id         VARCHAR(255) PRIMARY KEY,
+    email      VARCHAR(255) NOT NULL,
     prenom     VARCHAR(255) NOT NULL,
     nom        VARCHAR(255) NOT NULL,
     stockage   INT       DEFAULT 0,
