@@ -34,6 +34,7 @@ const FileUpload = () => {
     toaster.create({ title: "File uploaded", description: file?.name });
   };
 
+  
   return (
     <Box
       border="1px solid"
