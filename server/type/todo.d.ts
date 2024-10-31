@@ -12,15 +12,26 @@ export interface FileMetadataEntity {
     created_at: Date,
 }
 
-export interface CompleteFileEntity {
-    file: FileEntity,
-    metadata: FileMetadataEntity
+export interface CompleteFileEntityRequest {
+    id: string,
+    user_id: string,
+    endpoint: string,
+    file_id: string,
+    name: string,
+    size: number,
+    created_at: Date,
+}
+
+export interface CompleteFileEntityResponse {
+    id: string,
+    user_id: string,
+    endpoint: string,
 }
 
 
 export interface FileRepositoryI {
-    getAll: () => Promise<FileEntity[]>
-    getOne: (id: number) => Promise<FileEntity>
+    getAll: () => Promise<CompleteFileEntity[]>
+    getOne: (id: number) => Promise<CompleteFileEntity>
     insert: (todo: CompleteFileEntity) => Promise<>
     update: (todo: CompleteFileEntity) => Promise<TodoI>
     delete: (id: number) => Promise<void>

@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import {getRoutes} from "./route/api";
 import {getUserRoutes} from "./route/user";
 import mysql from 'mysql2/promise'
 import {getRepository} from "./repository/repository";
@@ -14,12 +13,10 @@ const port = 3009
 server.use(cors())
 
 const repository = getRepository(cursor)
-
 const app: App = {
     repository
 }
 
-const routes = getRoutes(app)
 const userRoutes = getUserRoutes()
 const filesRoutes = getFilesRoutes(app)
 
