@@ -2,7 +2,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Request, Response, NextFunction } from 'express';
-
+import cursor from '../services/sql.service';
+import {v4 as uuidv4} from 'uuid';
+import * as mysql from 'mysql2/promise';
 dotenv.config();
 
 const KEY = process.env.SECRET_KEY as string;
@@ -16,31 +18,29 @@ interface SignupRequest extends Request {
     };
 }
 
+interface User{
+    password: string;
+    nom:string;
+    prenom:string;
+    uuid: string;
+
+}
+
 interface LoginRequest extends Request {
     body: {
         email: string;
         password: string;
+        nom:string;
     };
 }
 
 export async function signup(req: SignupRequest, res: Response, next: NextFunction): Promise<void> {
     try {
         const hash = await bcrypt.hash(req.body.password, 10);
-        const { nom, prenom, email} = req.body;
-        // await userDatabase.createUser({
-        //     data: {
-        //         nom,
-        //         prenom,
-        //         email,
-        //         password: hash
-        //     }
-        // });
-        res.status(200).json({message:"User was created", data:{
-            "name": nom,
-            "firstname": prenom,
-            "email": email,
-            "password": hash
-        }});
+        const { email, nom, prenom} = req.body;
+        let myuuid = uuidv4();
+        await cursor.execute(`INSERT INTO users (id ,email, nom, prenom, password) VALUES (?, ?, ?, ?, ?)`, [myuuid,email, nom, prenom, hash]);
+        res.status(200).json({message:"User was created"});
     } catch (error) {
         res.status(500).json({ error });
     }
@@ -49,31 +49,21 @@ export async function signup(req: SignupRequest, res: Response, next: NextFuncti
 export async function login(req: LoginRequest, res: Response, next: NextFunction): Promise<void> {
       
     try {
-        // const user = await userDatabase.getOneUser({
-        //     where: {
-        //         email: req.body.email
-        //     }});
+        const { email, password } = req.body;
+        
+        const [rows] = await cursor.execute<mysql.RowDataPacket[]>(`SELECT * FROM users WHERE email = ?`, [email]);
+        const user = rows[0];
     
-       
-        // const userDataPassword = req.body.password;
-
-        const user =  {
-            uuid: "123456",
-            email: "test@test.com",
-            password: await bcrypt.hash("123456", 10)
-        } 
-    
-        if (user && user.email === req.body.email) {
-            const valid = await bcrypt.compare(req.body.password, user.password);
+        if (user) {
+            const valid = await bcrypt.compare(password, user.password);
             console.log(valid);
             if (!valid) {
-                res.status(401).json({ message: 'Incorrect email or password', data: req.body.password, userPassword: user.password});
+                res.status(401).json({ message: 'Incorrect email or password'});
             } else {
 
                 res.status(201).json({
-                    userId: user.uuid,
                     token: jwt.sign(
-                        { userId: user.uuid },
+                        { userId: user.id },
                         KEY,
                         { expiresIn: '1h' }
                     )

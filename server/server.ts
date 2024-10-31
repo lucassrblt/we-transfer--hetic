@@ -13,7 +13,6 @@ const port = 3009
 server.use(cors())
 
 const repository = getRepository(cursor)
-
 const app: App = {
     repository
 }
