@@ -1,14 +1,31 @@
-import './App.css'
-import {Button} from "@/components/ui/button"
+// src/App.tsx
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import RequireAuth from './context/RequireAuth';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import Header from './header/header';
 
-function App() {
+const App: React.FC = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <Header />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <HomePage />
+              </RequireAuth>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </Router>
+  );
+};
 
-    return (
-        <>
-            <Button>Click me</Button>
-            <Button>Click me</Button>
-        </>
-    )
-}
-
-export default App
+export default App;
