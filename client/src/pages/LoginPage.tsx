@@ -9,6 +9,7 @@ import { CgUser, CgUserAdd } from 'react-icons/cg';
 import { BiTransfer } from 'react-icons/bi';
 
 const LoginPage: React.FC = () => {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -28,6 +29,8 @@ const LoginPage: React.FC = () => {
     const user = { id: '1', name: 'John Doe', email };
     login(user);
   };
+
+ 
 
   return (
     <div className='login-form'>

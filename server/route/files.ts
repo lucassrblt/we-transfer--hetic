@@ -10,16 +10,24 @@ import archiver from "archiver";
 import { Request, Response, NextFunction } from 'express';
 import dotenv from "dotenv";
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config();
 
 const KEY = process.env.SECRET_KEY as string;
-
+const uploadDir = path.join(__dirname, 'uploads'); // Chemin vers le dossier 'uploads' dans 'server'
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, 'uploads'));
+        cb(null, uploadDir); // Utilise le dossier 'uploads' dans 'server'
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, Date.now() + '-' + file.originalname); // Nom unique basé sur l'horodatage
     }
 });
 const upload = multer({ storage: storage });
@@ -63,7 +71,17 @@ export function getFilesRoutes(app: App){
         res.send(response)
     })
 
-    router.post('/upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
+    return router
+}
+
+
+
+
+
+export function getFilesUploadRoutes(){
+    const router = express.Router();
+
+router.post('/', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.file) {
                  res.status(400).json({ message: 'Aucun fichier uploadé.' });
@@ -75,7 +93,7 @@ export function getFilesRoutes(app: App){
                 const zipFileName = `zip-${req.file.filename}.zip`;
                 await createZip(req.file.filename, zipFileName);
                 const token = jwt.sign({ filePath: zipFileName },KEY , { expiresIn: '1h' });
-            const temporaryLink = `${req.protocol}://${req.get('host')}/file/${token}`;
+            const temporaryLink = `${req.protocol}://${req.get('host')}/download/${token}`;
     
             res.status(201).json({ message: 'Fichier uploadé et compressé avec succès', link: temporaryLink });
             }
@@ -84,5 +102,32 @@ export function getFilesRoutes(app: App){
             res.status(500).json({ message: 'Erreur lors de l\'upload et de la création du ZIP', error });
         }
     })
+    return router
+}
+
+export function getFileRoute() {
+    const router = express.Router();
+
+    router.get('/:token', async (req: Request, res: Response): Promise<void> => {
+        console.log("je suis dans download");
+        
+        try {
+            const { token } = req.params;
+            console.log(token);
+    
+            const decoded = jwt.verify(token, KEY) as { filePath: string };
+            const zipFilePath = path.join(__dirname, 'uploads', decoded.filePath);
+    
+            if (!fs.existsSync(zipFilePath)) {
+             res.status(404).json({ message: 'Fichier non trouvé' });
+            }
+    
+            res.download(zipFilePath);
+        } catch (error) {
+            res.status(403).json({ message: 'Lien expiré ou non autorisé' });
+        }
+    });    
+    
+    
     return router
 }
