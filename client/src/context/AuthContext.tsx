@@ -5,6 +5,7 @@ interface AuthContextProps {
   user: User | null;
   login: (user: User) => void;
   logout: () => void;
+  signUp: (user: User) => void;
 }
 
 interface User {
@@ -32,7 +33,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('user', JSON.stringify(user));
     navigate('/');
   };
-
+  const signUp = (user: User) => {
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+    navigate('/');
+  };
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
@@ -40,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout,signUp }}>
       {children}
     </AuthContext.Provider>
   );

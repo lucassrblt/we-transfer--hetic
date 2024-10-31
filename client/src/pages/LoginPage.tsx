@@ -1,5 +1,5 @@
 // src/pages/LoginPage.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Input, Heading, VStack } from '@chakra-ui/react';
 
 import { useAuth } from '../context/AuthContext';
@@ -13,11 +13,18 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [prenom, setPrenom] = useState('');
-  const { login } = useAuth();
-  const [state, setState] = useState('Connexion');
+  const { login,user } = useAuth();
+  const navigate = useNavigate();
+  const [state, setState] = useState('SignIn');
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user]);
+
 
   const handleLogin = () => {
-    // Logique de connexion (exemple de vérification de base)
+    // Logique de SignIn (exemple de vérification de base)
     const user = { id: '1', name: 'John Doe', email };
     login(user);
   };
@@ -37,17 +44,17 @@ const LoginPage: React.FC = () => {
             <Box as="span" color={'green.600'}>Hetic</Box>Transfer <BiTransfer style={{marginLeft: '10px'}}/>
         </Heading>
          <Box width={"100%"} textAlign="center" display={"flex"} justifyContent={"space-between"} position={"relative"}>
-            <Button onClick={() => setState('Connexion')} color={state === 'Connexion' ? 'green.800' : 'gray'} bg={state === 'Connexion' ? 'green.100' : 'gray.100'} width={"50%"}>
-               <CgUser/> Connexion
+            <Button onClick={() => setState('SignIn')} color={state === 'SignIn' ? 'green.800' : 'gray'} bg={state === 'SignIn' ? 'green.100' : 'gray.100'} width={"50%"}>
+               <CgUser/> SignIn
             </Button>
-            <Button onClick={() => setState('Inscription')} color={state === 'Inscription' ? 'green.800' : 'gray'} bg={state === 'Inscription' ? 'green.100' : 'gray.100'} width={"50%"}>
+            <Button onClick={() => setState('SignUp')} color={state === 'SignUp' ? 'green.800' : 'gray'} bg={state === 'SignUp' ? 'green.100' : 'gray.100'} width={"50%"}>
                 <CgUserAdd/>
-                Inscription
+                SignUp
             </Button>
         </Box>
 
         {
-            state === 'Inscription' && (
+            state === 'SignUp' && (
               <> <Input
                     type="text"
                     placeholder="Entrez votre nom"

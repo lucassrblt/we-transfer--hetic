@@ -47,6 +47,8 @@ const FileUpload = () => {
       width={"100%"}
       backgroundColor="white"
       overflowY={"auto"}
+      overflowX={"hidden"}
+      className="scrollBar"
     >
       <Toaster/>
       <VStack  align="stretch">

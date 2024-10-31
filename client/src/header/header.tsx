@@ -3,19 +3,20 @@ import {
     Button,
     Flex,
     HStack,
-    Menu,
     MenuItem,
-    Link,
   } from "@chakra-ui/react";
-  import { ChevronDownIcon } from "@chakra-ui/icons";
   import { FC } from "react";
   import { useAuth } from "@/context/AuthContext";
 import { LinkButton } from "@/components/ui/link-button";
-import { CgUser } from "react-icons/cg";
-import { FaUser } from "react-icons/fa";
+import { MenuContent, MenuRoot, MenuTrigger } from "@/components/ui/menu";
+import { Avatar } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
+import { TRANSFER } from "@/constants/Routes";
+import { GoUpload } from "react-icons/go";
   
   const Header: FC = () => {
-    const { user } = useAuth();
+    const { user,logout } = useAuth();
+    const navigate = useNavigate();
     return (
       <Box as="header"  color={"gray-800"} px={8} py={4} position={"fixed"} top={0} left={0} right={0} zIndex={100}>
         <Flex align="center" justify="flex-end" gap={2}>
@@ -25,26 +26,59 @@ import { FaUser } from "react-icons/fa";
             color={"gray-600"}
             _hover={{ bg: "green.200" }}
             rounded="xl"
+            onClick={() => navigate("/download")}
           >
-            Transfer
+            Download
           </Button>
           {user && (
-              <Button
-                colorScheme="whiteAlpha"
+            <HStack>
+                 <Button
+            colorScheme="whiteAlpha"
+            color={"gray-600"}
+            _hover={{ bg: "green.200" }}
+            rounded="xl"
+            onClick={() => navigate(TRANSFER)}
+          >
+            Upload <GoUpload/>
+          </Button>
+            <MenuRoot>
+            <MenuTrigger asChild>
+                <Button  colorScheme="whiteAlpha"
                 color={"gray-700"}
                 bg="green.400"
-                _hover={{ bg: "gray.200" }}
-                rounded="xl"
-              >
-                {user.name} <FaUser style={{width:"12px"}}/>
-              </Button>
+                _hover={{ bg: "gray.400" }}
+                paddingRight={0}
+                rounded="2xl"  size="sm">
+                      {user.name} <Avatar marginLeft={'auto'} size="xs" name={user.name}  />
+                    </Button>
+                  </MenuTrigger>
+                  <MenuContent>
+                    <MenuItem
+                      value="delete"
+                      color="fg.error"
+                      _hover={{ bg: "bg.error", color: "fg.error" }}
+                      cursor={"pointer"}
+                      onClick={logout}
+                    >
+                     Logout...
+                    </MenuItem>
+                  </MenuContent>
+                  <Button
+                    colorScheme="whiteAlpha"
+                    bg="gray.900"
+                    color={"white"}
+                    _hover={{ bg: "gray.600" }}
+                    rounded="xl"
+                    onClick={() => navigate("/files")}
+                    >
+                        My files
+                    </Button>
+                </MenuRoot></HStack>
           )}
         </HStack>
-          <HStack bg={"white"} p={1} rounded="2xl">
+         {!user && <HStack bg={"white"} p={1} rounded="2xl">
           
-            <LinkButton href="#" color={"gray-900"} fontWeight="medium" _hover={{ color: "gray.600" }}>
-              Login
-            </LinkButton>
+
             <Button
               colorScheme="whiteAlpha"
               bg="gray.900"
@@ -52,9 +86,9 @@ import { FaUser } from "react-icons/fa";
               _hover={{ bg: "gray.600" }}
               rounded="xl"
             >
-              Sign Up
+              Support
             </Button>
-          </HStack>
+          </HStack>}
         </Flex>
       </Box>
     );
