@@ -13,7 +13,7 @@ services:
       - ./init:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_DATABASE: "express"
+      MYSQL_DATABASE: "we_transfer"
 
   backend:
     build:
@@ -21,6 +21,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
 
     depends_on:
       database:
