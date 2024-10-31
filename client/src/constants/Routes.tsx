@@ -1,4 +1,4 @@
-export const TRANSFER = ""
+export const TRANSFER = "/"
 export const LOGIN = "/login"
 export const FILES = "/files"
 export const NOTFOUND = "/404"

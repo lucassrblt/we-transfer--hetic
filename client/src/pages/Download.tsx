@@ -15,7 +15,7 @@ export const DownloadPage: React.FC = () => {
         <Group attached>
           <InputAddon>https://</InputAddon>
           <Input placeholder="Enter URL..." bg={"white"} color={"gray.800"} />
-          <Button colorScheme="green" onClick={() => setDownloaded(true)}>
+          <Button bg="green.400" onClick={() => setDownloaded(true)}>
             Download
           </Button>
         </Group>

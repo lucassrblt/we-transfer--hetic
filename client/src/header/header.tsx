@@ -11,12 +11,13 @@ import { LinkButton } from "@/components/ui/link-button";
 import { MenuContent, MenuRoot, MenuTrigger } from "@/components/ui/menu";
 import { Avatar } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { TRANSFER } from "@/constants/Routes";
+import { DOWNLOAD, FILES, TRANSFER } from "@/constants/Routes";
 import { GoUpload } from "react-icons/go";
   
   const Header: FC = () => {
     const { user,logout } = useAuth();
     const navigate = useNavigate();
+    const location = window.location.pathname;  
     return (
       <Box as="header"  color={"gray-800"} px={8} py={4} position={"fixed"} top={0} left={0} right={0} zIndex={100}>
         <Flex align="center" justify="flex-end" gap={2}>
@@ -25,6 +26,7 @@ import { GoUpload } from "react-icons/go";
             colorScheme="whiteAlpha"
             color={"gray-600"}
             _hover={{ bg: "green.200" }}
+            bg={location ===DOWNLOAD ? "green.400" : "white"}
             rounded="xl"
             onClick={() => navigate("/download")}
           >
@@ -36,6 +38,7 @@ import { GoUpload } from "react-icons/go";
             colorScheme="whiteAlpha"
             color={"gray-600"}
             _hover={{ bg: "green.200" }}
+            bg={location === TRANSFER ? "green.400" : "white"}
             rounded="xl"
             onClick={() => navigate(TRANSFER)}
           >
@@ -65,11 +68,11 @@ import { GoUpload } from "react-icons/go";
                   </MenuContent>
                   <Button
                     colorScheme="whiteAlpha"
-                    bg="gray.900"
-                    color={"white"}
-                    _hover={{ bg: "gray.600" }}
+                    _hover={{ bg: "green.200" }}
                     rounded="xl"
-                    onClick={() => navigate("/files")}
+                    color={"gray.900"}
+                    bg={location === FILES ? "green.400" : "white"}
+                    onClick={() => navigate(FILES)}
                     >
                         My files
                     </Button>
