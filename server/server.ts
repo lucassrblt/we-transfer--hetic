@@ -1,7 +1,8 @@
 import express from 'express'
 import cors from 'cors'
-// import {getRoutes} from "./route/api";
-// import {getAdminRoutes} from "./route/admin";
+import {getRoutes} from "./route/api";
+import {getUserRoutes} from "./route/user";
+import mysql from 'mysql2/promise'
 import {getRepository} from "./repository/repository";
 import {App} from "./type/app";
 import cursor from "./services/sql.service";
@@ -18,16 +19,15 @@ const app: App = {
     repository
 }
 
-// const routes = getRoutes(app)
-// const adminRoutes = getAdminRoutes()
+const routes = getRoutes(app)
+const userRoutes = getUserRoutes()
 const filesRoutes = getFilesRoutes(app)
 
 server.use(express.json())
 server.use(express.static("./public"))
 
-// server.use(routes)
 server.use("/files", filesRoutes)
-// server.use("/admin", adminRoutes)
+server.use("/user", userRoutes)
 
 
 server.use((req, res, next) => {
