@@ -24,8 +24,8 @@ server.use(express.json())
 server.use(express.static("./public"))
 
 server.use("/files", filesRoutes)
-server.use(authMiddleware)
 server.use("/user", userRoutes)
+server.use(authMiddleware)
 
 
 server.listen(port, () => console.log(`App running on port ${port}`))
