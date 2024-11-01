@@ -62,6 +62,9 @@ export async function login(req: LoginRequest, res: Response, next: NextFunction
             } else {
 
                 res.status(201).json({
+                    usernom: user.nom,
+                    userprenom: user.prenom,
+                    useremail: user.email,
                     token: jwt.sign(
                         { userId: user.id },
                         KEY,

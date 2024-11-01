@@ -1,5 +1,8 @@
 .idea
+<<<<<<< HEAD
 # client
+=======
+>>>>>>> a313c9d64d5591cdcd263b91c0a18a5d8c5b358a
 node_modules
 .env
 

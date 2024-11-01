@@ -17,11 +17,14 @@ import {
 import { HiUpload } from "react-icons/hi";
 import { toaster,Toaster} from "@/components/ui/toaster";
 import { BiTransferAlt } from "react-icons/bi";
+import sendFile from '../functions/sendFile.ts'
 
 const FileUpload = () => {
   const [email, setEmail] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [file, setFile] = useState("");
+
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Handle the file upload
@@ -31,10 +34,20 @@ const FileUpload = () => {
       toaster.create({ title: "File size exceeded", description: file?.name });
       return;
     }
+    setFile(file)
     toaster.create({ title: "File uploaded", description: file?.name });
   };
 
-  
+  const handleTransfer = async () => {
+    const transferObject = {
+      email,
+      title,
+      message
+    }
+    await sendFile(transferObject, file)
+
+  }
+
   return (
     <Box
       border="1px solid"
@@ -107,7 +120,7 @@ const FileUpload = () => {
           
         </Box>
         <Button borderRadius="xl"
-        colorScheme="purple" bg={'green.500'} color={'white'} _hover={{bg: 'green.400',scale: "1.02"}} width={"100%"} border={"1px solid"} borderColor={'green.500'}>
+        colorScheme="purple" bg={'green.500'} color={'white'} _hover={{bg: 'green.400',scale: "1.02"}} width={"100%"} border={"1px solid"} borderColor={'green.500'} onClick={handleTransfer}>
            <BiTransferAlt/>
             Transférer
           </Button>

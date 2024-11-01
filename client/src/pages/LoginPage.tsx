@@ -10,6 +10,7 @@ import { BiTransfer } from 'react-icons/bi';
 import { toaster,Toaster } from '@/components/ui/toaster';
 
 const LoginPage: React.FC = () => {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -41,6 +42,8 @@ const LoginPage: React.FC = () => {
       handleSignUp();
     }
   }
+
+ 
 
   return (
     <div className='login-form'>
