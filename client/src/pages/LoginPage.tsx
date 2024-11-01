@@ -1,19 +1,22 @@
 // src/pages/LoginPage.tsx
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Input, Heading, VStack } from '@chakra-ui/react';
+import { Box, Button, Input, Heading, VStack, Spinner } from '@chakra-ui/react';
 
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { PasswordInput } from '@/components/ui/password-input';
 import { CgUser, CgUserAdd } from 'react-icons/cg';
 import { BiTransfer } from 'react-icons/bi';
+import { toaster,Toaster } from '@/components/ui/toaster';
 
 const LoginPage: React.FC = () => {
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [prenom, setPrenom] = useState('');
-  const { login,user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { login,user,signUp } = useAuth();
   const navigate = useNavigate();
   const [state, setState] = useState('SignIn');
   useEffect(() => {
@@ -23,14 +26,39 @@ const LoginPage: React.FC = () => {
   }, [user]);
 
 
-  const handleLogin = () => {
-    // Logique de SignIn (exemple de vérification de base)
-    const user = { id: '1', name: 'John Doe', email };
-    login(user);
+  const handleLogin = async () => {
+    const user = { email: email , password: password , name: "", prenom: ""};
+    const loginResponse =  login(user,setLoading);
   };
+  const handleSignUp = async() => {
+    const user = { email: email , password: password, name: name, prenom: prenom};
+     const signUpResponse =  signUp(user,setLoading);
+  }
+
+  const action = ()=>{
+    if(state === 'SignIn'){
+      handleLogin();
+    }else{
+      handleSignUp();
+    }
+  }
+
+ 
 
   return (
     <div className='login-form'>
+         <Button
+      variant="outline"
+      size="sm"
+      onClick={() =>
+        toaster.create({
+          description: "File saved successfully",
+          type: "info",
+        })
+      }
+    >
+      Show Toast
+    </Button>
         <Box
         mx="auto"
         bg={'white'}
@@ -56,7 +84,7 @@ const LoginPage: React.FC = () => {
         {
             state === 'SignUp' && (
               <> <Input
-                    type="text"
+                    type="name"
                     placeholder="Entrez votre nom"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -67,7 +95,7 @@ const LoginPage: React.FC = () => {
                 />
 
                 <Input
-                    type="prenom"
+                    type="surname"
                     placeholder="Entrez votre prenom"
                     value={prenom}
                     variant="subtle" 
@@ -96,8 +124,10 @@ const LoginPage: React.FC = () => {
           <PasswordInput variant="subtle" 
             bg={'gray.100'} value={password} onChange={(e) => setPassword(e.target.value)} color={'gray.800'} size={'xl'} colorPalette={'gray'} placeholder='Entrez votre mot de passe' colorScheme={'gray'} />
  
-        <Button colorScheme="blue" onClick={handleLogin} size={'lg'} bg={'green.400'} _hover={{ bg: 'green.500' }} width={'100%'}>
-          Se connecter
+        <Button colorScheme="blue" onClick={action} size={'lg'} bg={'green.400'} _hover={{ bg: 'green.500' }} width={'100%'}>
+          {
+            loading ? <Spinner size="sm" color="white" /> : state === 'SignIn' ? 'Se connecter' : 'S\'inscrire'
+        }
         </Button>
       </VStack>
     </Box>

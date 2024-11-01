@@ -5,20 +5,7 @@ import mysql from 'mysql2/promise'
 import {getRepository} from "./repository/repository";
 import {App} from "./type/app";
 import cursor from "./services/sql.service";
-import {getFilesRoutes} from "./route/files";
-import multer from 'multer'
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Destination folder for uploaded files
-    },
-    filename: (req, file, cb) => {
-        cb(null,Date.now() + '-' + file.originalname); // Rename the file to include the timestamp
-    },
-});
-
-export const upload = multer({ storage: storage });
-
+import {getFilesRoutes, getFilesUploadRoutes, getFileRoute} from "./route/files";
 
 const server = express()
 const port = 3009
@@ -32,13 +19,15 @@ const app: App = {
 
 const userRoutes = getUserRoutes()
 const filesRoutes = getFilesRoutes(app)
-
+const filesUploadRoutes = getFilesUploadRoutes()
+const fileRoute = getFileRoute()
 server.use(express.json())
 server.use(express.static("./public"))
 
 server.use("/files", filesRoutes)
 server.use("/user", userRoutes)
-
+server.use("/files/upload", filesUploadRoutes)
+server.use('/download', fileRoute)
 
 server.use((req, res, next) => {
     res.status(404)

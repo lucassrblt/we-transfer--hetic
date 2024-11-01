@@ -11,7 +11,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { MenuContent, MenuRoot, MenuTrigger } from "@/components/ui/menu";
 import { Avatar } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
-import { DOWNLOAD, FILES, TRANSFER } from "@/constants/Routes";
+import { DOWNLOAD, FILES, LOGIN, TRANSFER } from "@/constants/Routes";
 import { GoUpload } from "react-icons/go";
   
   const Header: FC = () => {
@@ -88,8 +88,9 @@ import { GoUpload } from "react-icons/go";
               color={"white"}
               _hover={{ bg: "gray.600" }}
               rounded="xl"
+            onClick={() => navigate(LOGIN)}
             >
-              Support
+              Login
             </Button>
           </HStack>}
         </Flex>

@@ -1,18 +1,22 @@
+import { API_Url } from '@/constants/ApiUrl';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { toaster,Toaster } from "@/components/ui/toaster"
+import { toast } from 'react-toastify';
 interface AuthContextProps {
   user: User | null;
-  login: (user: User) => void;
+  login: (user: User,loading: (value: boolean) => void) => Promise<any>;
   logout: () => void;
-  signUp: (user: User) => void;
+  signUp: (user: User,loading: (value: boolean) => void) => Promise<any>;
 }
 
 interface User {
-  id: string;
-  name: string;
   email: string;
+  password: string;
+  name: string;
+  prenom: string;
 }
+
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -28,24 +32,122 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (user: User) => {
-    setUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    navigate('/');
+  const login = async (user: User,loading: (value: boolean) => void) => {
+    loading(true)
+   try{ const response = await fetch(API_Url + '/user/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: user.email,
+        password: user.password,
+      }),
+    });
+    const data = await response.json();
+    if (response.status === 201) {
+      localStorage.setItem('user', JSON.stringify(user));
+      toast.success('Welcome back! '+user.email,{
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+      navigate('/');
+      setUser(user);
+      return data;
+    }
+    else {
+      toaster.create(
+        {
+          type: "error",
+          title: data.message,
+        }
+      )
+      console.log('error');
+      return null;
+    }}
+    catch(e){
+
+      console.log(e);
+      return null;
+    }
+    finally{
+      loading(false)
+    }
   };
-  const signUp = (user: User) => {
-    setUser(user);
-    localStorage.setItem('user', JSON.stringify(user));
-    navigate('/');
+  const signUp = async(user: User,loading: (value: boolean) => void) => {
+    loading(true)
+   try{ const response = await fetch(API_Url + '/user/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: user.email,
+        password: user.password,
+        prenom: user.prenom,
+        nom: user.name,
+      }),
+    });
+    const data = await response.json();
+    if (data) {
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
+      navigate('/');
+      toast.success('Welcome! '+user.email,{
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return data;
+    }
+    else {
+      toaster.create(
+        {
+          type: "error",
+          title: data.message,
+        }
+      )
+      console.log('error');
+      return null;
+    }}
+    catch(e){
+
+      console.log(e);
+      return null;
+    }
+    finally{
+      loading(false)
+    }
   };
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+
+    toast.info('You have been logged out',{
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    }
+  );
     navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout,signUp }}>
+    <AuthContext.Provider value={{ user, login, logout, signUp }}>
       {children}
     </AuthContext.Provider>
   );

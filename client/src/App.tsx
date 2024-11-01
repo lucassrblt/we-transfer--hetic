@@ -9,11 +9,16 @@ import Header from './header/header';
 import { UserFiles } from './pages/UserFiles';
 import { DOWNLOAD, FILES, LOGIN, NOTFOUND, TRANSFER } from './constants/Routes';
 import { DownloadPage } from './pages/Download';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Toaster } from './components/ui/toaster';
 
 const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
+      <ToastContainer />
+      <Toaster/>
         <Header />
         <Routes>
           <Route path={LOGIN} element={<LoginPage />} />

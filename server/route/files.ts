@@ -2,31 +2,30 @@ import express from "express";
 import {App} from "../type/app";
 import multer from "multer";
 import path from "path";
+import jwt from "jsonwebtoken";
 import fs from "fs";
 import archiver from "archiver";
 import { Request, Response, NextFunction } from 'express';
 import dotenv from "dotenv";
-import { fileURLToPath } from 'url';
-import {mailOptions, transporter} from "../services/nodemailer.service";
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
 const KEY = process.env.SECRET_KEY as string;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const uploadPath = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath);
+const uploadDir = path.join(__dirname, 'uploads'); // Chemin vers le dossier 'uploads' dans 'server'
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
-
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadPath);
+        cb(null, uploadDir); // Utilise le dossier 'uploads' dans 'server'
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '-' + file.originalname);
+        cb(null, Date.now() + '-' + file.originalname); // Nom unique basé sur l'horodatage
     }
 });
 const upload = multer({ storage: storage });
@@ -51,6 +50,7 @@ const createZip = (fileName: string, zipName: string): Promise<void> => {
 export function getFilesRoutes(app: App){
     const router = express.Router()
 
+    // router.get('/files', getFiles)
     router.get('', (req, res, next) => {
         const response = res.json('test')
         res.send(response)
@@ -80,25 +80,51 @@ export function getFilesRoutes(app: App){
 
     router.post('', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
         try {
-            console.log('ici')
-            // Call mail history
-            transporter.sendMail(mailOptions, function(error, info){
-                if (error) {
-                    console.log("error", error);
-                } else {
-                    console.log('Email sent: ' + info.response);
-                }
-            });
-
-            // const mailData = JSON.parse(req.body.mailData)
-            // console.log(mailData)
-            // const userId = JSON.parse(req.body.filedata).userId
-            // const response = await app.repository.mailRepository.insert(mailData, userId)
-            // res.send(response)
-
+            if (!req.file) {
+                 res.status(400).json({ message: 'Aucun fichier uploadé.' });
+            }
+    
+            // Création du fichier ZIP
+            
+            else{
+                const zipFileName = `zip-${req.file.filename}.zip`;
+                await createZip(req.file.filename, zipFileName);
+                const token = jwt.sign({ filePath: zipFileName },KEY , { expiresIn: '1h' });
+            const temporaryLink = `${req.protocol}://${req.get('host')}/download/${token}`;
+    
+            res.status(201).json({ message: 'Fichier uploadé et compressé avec succès', link: temporaryLink });
+            }
+            
         } catch (error) {
             res.status(500).json({ message: 'Erreur lors de l\'upload et de la création du ZIP', error });
         }
     })
+    return router
+}
+
+export function getFileRoute() {
+    const router = express.Router();
+
+    router.get('/:token', async (req: Request, res: Response): Promise<void> => {
+        console.log("je suis dans download");
+
+        try {
+            const { token } = req.params;
+            console.log(token);
+
+            const decoded = jwt.verify(token, KEY) as { filePath: string };
+            const zipFilePath = path.join(__dirname, 'uploads', decoded.filePath);
+
+            if (!fs.existsSync(zipFilePath)) {
+             res.status(404).json({ message: 'Fichier non trouvé' });
+            }
+
+            res.download(zipFilePath);
+        } catch (error) {
+            res.status(403).json({ message: 'Lien expiré ou non autorisé' });
+        }
+    });
+
+
     return router
 }
