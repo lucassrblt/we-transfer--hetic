@@ -23,8 +23,8 @@ const filesRoutes = getFilesRoutes(app)
 server.use(express.json())
 server.use(express.static("./public"))
 
-server.use("/files", filesRoutes)
 server.use("/user", userRoutes)
+server.use("/files", filesRoutes)
 server.use(authMiddleware)
 
 

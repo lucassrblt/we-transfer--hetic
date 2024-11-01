@@ -7,7 +7,7 @@ import {
     FileRepositoryI, uuid
 } from "../type/todo";
 import {SuccessResponse} from "../middleware/globalResponseHandler";
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 
 export function getFileRepository(database: Pool): FileRepositoryI {
@@ -35,16 +35,18 @@ export function getFileRepository(database: Pool): FileRepositoryI {
             `, [id]);            //@ts-ignore
             return results[0] as CompleteFileEntityResponse
         },
-        insert: async (fileEntity: CompleteFileEntityRequest, fileId: uuid): anyType => {
+        insert: async (fileEntity: CompleteFileEntityRequest, fileId: uuid): any => {
             const {file, metadata} = fileEntity;
+
             const fileMetaId = uuidv4()
+
             const [query]: any = await database.execute("INSERT INTO files (id, user_id, endpoint) VALUES (?, ?, ?)", [fileId, file.user_id, file.endpoint]);
 
             if (query.affectedRows === 0) {
                 throw new Error("Error while inserting file");
             }
 
-            const [queryMetadata]: any = await database.execute("INSERT INTO files_metadata (id, file_id, name, size, created_at) VALUES (?, ?, ?, ?, ?)", [fileMetaId, fileId, metadata.name, metadata.size, metadata.created_at]);
+            const [queryMetadata]: any = await database.execute("INSERT INTO files_metadata (id, file_id, name, size) VALUES (?, ?, ?, ?)", [fileMetaId, fileId, metadata.name, metadata.size]);
 
             if (queryMetadata.affectedRows === 0) {
                 throw new Error("Error while inserting file metadata");
