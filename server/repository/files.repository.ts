@@ -35,9 +35,8 @@ export function getFileRepository(database: Pool): FileRepositoryI {
             `, [id]);            //@ts-ignore
             return results[0] as CompleteFileEntityResponse
         },
-        insert: async (fileEntity: CompleteFileEntityRequest): anyType => {
+        insert: async (fileEntity: CompleteFileEntityRequest, fileId: uuid): anyType => {
             const {file, metadata} = fileEntity;
-            const fileId = uuidv4()
             const fileMetaId = uuidv4()
             const [query]: any = await database.execute("INSERT INTO files (id, user_id, endpoint) VALUES (?, ?, ?)", [fileId, file.user_id, file.endpoint]);
 

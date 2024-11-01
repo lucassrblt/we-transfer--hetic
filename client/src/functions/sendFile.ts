@@ -6,7 +6,7 @@ export default async function sendFile(mailObject, file){
         formData.append('mailData', JSON.stringify(mailObject));
         formData.append('file', file);
         formData.append('metadata', JSON.stringify({ name: file.name, size: file.size }));
-        formData.append('filedata', JSON.stringify({ userId: "testtt"}))
+        formData.append('filedata', JSON.stringify({ userId: "1"}))
 
         const response = await fetch(API_Url + "/files/upload", {
             method: "POST",

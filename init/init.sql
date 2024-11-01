@@ -31,10 +31,12 @@ CREATE TABLE files_metadata (
 CREATE TABLE mail_history (
     id VARCHAR(255) PRIMARY KEY,
     user_id VARCHAR(255) NOT NULL,
+    file_id VARCHAR(255) NOT NULL,
     receiver VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
     message VARCHAR(255) DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (file_id) REFERENCES files (id)
 )
 
 
