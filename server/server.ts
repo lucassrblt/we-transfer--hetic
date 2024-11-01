@@ -26,15 +26,16 @@ server.use(express.json())
 server.use(express.static("./public"))
 server.use('/download', fileRoute)
 server.use("/files", filesRoutes)
-server.use(authMiddleware)
-server.use("/user", userRoutes)
-server.use("/files/upload", filesUploadRoutes) 
-
 server.use((req, res, next) => {
     res.status(404)
     res.json({
         message: "t'es perdu"
     })
 })
+server.use(authMiddleware)
+server.use("/user", userRoutes)
+server.use("/files/upload", filesUploadRoutes) 
+
+
 
 server.listen(port, () => console.log(`App running on port ${port}`))

@@ -5,6 +5,7 @@ import { HiArchiveBox } from "react-icons/hi2";
 import { GoFileZip } from "react-icons/go";
 import { LuCheck, LuPencilLine, LuX } from "react-icons/lu";
 import { CgCopy } from "react-icons/cg";
+import { API_Url } from "@/constants/ApiUrl";
 
 interface File {
     id: number;
@@ -33,22 +34,35 @@ export const UserFiles = () => {
         setFiles(newFiles);
     }
 
+    const fetchFiles = async () => {
+        const token = localStorage.getItem('token');
+        const response = await fetch(API_Url + "/files/all",{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const data = await response.json();
+        setFiles(data);
+    }
 
     useEffect(() => {
-        setFiles([
-            {
-                id: 1,
-                name: "file1",
-                size: 10000000,
-                lastModified: 1620000000000,
-            },
-            {
-                id: 2,
-                name: "file2",
-                size: 200000000,
-                lastModified: 162000000000,
-            },
-        ]);
+        // setFiles([
+        //     {
+        //         id: 1,
+        //         name: "file1",
+        //         size: 10000000,
+        //         lastModified: 1620000000000,
+        //     },
+        //     {
+        //         id: 2,
+        //         name: "file2",
+        //         size: 200000000,
+        //         lastModified: 162000000000,
+        //     },
+        // ]);
+        fetchFiles();
         setLoading(false);
     }, []);
 
