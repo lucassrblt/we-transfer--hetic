@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise'
 
 const cursor = mysql.createPool({
-    host: 'localhost',
+    host: 'database',
     port: 3307,
     database: 'we_transfer',
     user: 'root',

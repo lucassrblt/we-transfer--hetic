@@ -6,6 +6,19 @@ import {getRepository} from "./repository/repository";
 import {App} from "./type/app";
 import cursor from "./services/sql.service";
 import {getFilesRoutes} from "./route/files";
+import multer from 'multer'
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Destination folder for uploaded files
+    },
+    filename: (req, file, cb) => {
+        cb(null,Date.now() + '-' + file.originalname); // Rename the file to include the timestamp
+    },
+});
+
+export const upload = multer({ storage: storage });
+
 
 const server = express()
 const port = 3009

@@ -45,7 +45,6 @@ const FileUpload = () => {
       message
     }
     await sendFile(transferObject, file)
-
   }
 
   return (

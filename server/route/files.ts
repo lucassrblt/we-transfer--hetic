@@ -1,22 +1,29 @@
 import express from "express";
-// import {getFiles} from "../services/files.services";
 import {App} from "../type/app";
-import {getFileRepository} from "../repository/files.repository";
 import multer from "multer";
 import path from "path";
-import jwt from "jsonwebtoken";
 import fs from "fs";
 import archiver from "archiver";
 import { Request, Response, NextFunction } from 'express';
 import dotenv from "dotenv";
+import { fileURLToPath } from 'url';
+import {mailOptions, transporter} from "../services/nodemailer.service";
+
 
 dotenv.config();
 
 const KEY = process.env.SECRET_KEY as string;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const uploadPath = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadPath)) {
+    fs.mkdirSync(uploadPath);
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, 'uploads'));
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
@@ -44,7 +51,6 @@ const createZip = (fileName: string, zipName: string): Promise<void> => {
 export function getFilesRoutes(app: App){
     const router = express.Router()
 
-    // router.get('/files', getFiles)
     router.get('', (req, res, next) => {
         const response = res.json('test')
         res.send(response)
@@ -54,32 +60,42 @@ export function getFilesRoutes(app: App){
         const response = app.repository.filesRepository.getAll()
         res.send(response)
     })
-    router.get('/:id(\\d+)', (req, res, next) => {
-        const response = app.repository.filesRepository.getOne(parseInt(req.params.id))
-    })
-    router.get('/all', (req, res, next) => {
 
-        const response = app.repository.filesRepository.getAll()
+    router.get('/:id', (req, res, next) => {
+        const response = app.repository.filesRepository.getOne(req.params.id)
+        res.send(response)
+
+    })
+
+    router.put('/:id', (req, res, next) => {
+        const data = req.body
+        const response = app.repository.filesRepository.update(req.params.id, data)
         res.send(response)
     })
 
-    router.post('/upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
+    router.delete('/:id', (req, res, next) => {
+        const response = app.repository.filesRepository.delete(req.params.id)
+        res.send(response)
+    })
+
+    router.post('', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
         try {
-            if (!req.file) {
-                 res.status(400).json({ message: 'Aucun fichier uploadé.' });
-            }
-    
-            // Création du fichier ZIP
-            
-            else{
-                const zipFileName = `zip-${req.file.filename}.zip`;
-                await createZip(req.file.filename, zipFileName);
-                const token = jwt.sign({ filePath: zipFileName },KEY , { expiresIn: '1h' });
-            const temporaryLink = `${req.protocol}://${req.get('host')}/file/${token}`;
-    
-            res.status(201).json({ message: 'Fichier uploadé et compressé avec succès', link: temporaryLink });
-            }
-            
+            console.log('ici')
+            // Call mail history
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log("error", error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
+
+            // const mailData = JSON.parse(req.body.mailData)
+            // console.log(mailData)
+            // const userId = JSON.parse(req.body.filedata).userId
+            // const response = await app.repository.mailRepository.insert(mailData, userId)
+            // res.send(response)
+
         } catch (error) {
             res.status(500).json({ message: 'Erreur lors de l\'upload et de la création du ZIP', error });
         }
