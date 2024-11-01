@@ -6,7 +6,7 @@ import {
     FileEntity,
     FileRepositoryI, uuid
 } from "../type/todo";
-import {SuccessResponse} from "../middlewares/globalResponseHandler";
+import {SuccessResponse} from "../middleware/globalResponseHandler";
 import { v4 as uuidv4 } from 'uuid';
 
 
