@@ -47,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     if (response.status === 201) {
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', data.token);
       toast.success('Welcome back! '+user.email,{
         position: "bottom-right",
         autoClose: 5000,
@@ -57,8 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         progress: undefined,
       }
     );
+      setUser(data);
       navigate('/');
-      setUser(user);
       return data;
     }
     else {
@@ -95,8 +96,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }),
     });
     const data = await response.json();
-    if (data) {
-      setUser(user);
+    if (response.status === 200) {
+      setUser(data.data);
+      //mettre le token dans le local storage
+      localStorage.setItem('token', data.data.token);
       localStorage.setItem('user', JSON.stringify(user));
       navigate('/');
       toast.success('Welcome! '+user.email,{
@@ -132,7 +135,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
-
+    localStorage.removeItem('token');
     toast.info('You have been logged out',{
       position: "bottom-right",
       autoClose: 5000,
