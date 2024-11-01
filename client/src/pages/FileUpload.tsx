@@ -45,7 +45,6 @@ const FileUpload = () => {
       message
     }
     await sendFile(transferObject, file)
-
   }
 
   return (
@@ -60,6 +59,9 @@ const FileUpload = () => {
       maxW="300px"
       width={"100%"}
       backgroundColor="white"
+      transform={"translateY(50%)"}
+      left={"0"}
+      position={"fixed"}
       overflowY={"auto"}
       overflowX={"hidden"}
       className="scrollBar"

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { PasswordInput } from '@/components/ui/password-input';
 import { CgUser, CgUserAdd } from 'react-icons/cg';
 import { BiTransfer } from 'react-icons/bi';
-import { toaster,Toaster } from '@/components/ui/toaster';
+import { toaster } from '@/components/ui/toaster';
 
 const LoginPage: React.FC = () => {
   
@@ -29,10 +29,12 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     const user = { email: email , password: password , name: "", prenom: ""};
     const loginResponse =  login(user,setLoading);
+    return loginResponse;
   };
   const handleSignUp = async() => {
     const user = { email: email , password: password, name: name, prenom: prenom};
      const signUpResponse =  signUp(user,setLoading);
+     return signUpResponse;
   }
 
   const action = ()=>{
