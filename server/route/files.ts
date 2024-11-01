@@ -114,7 +114,6 @@ export function getFilesRoutes(app: App) {
 
     router.post('/upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
         try {
-            console.log(req.body)
             const fileData = JSON.parse(req.body.filedata)
             const mailData = JSON.parse(req.body.mailData)
             const metaData = JSON.parse(req.body.metadata)
@@ -139,7 +138,7 @@ export function getFilesRoutes(app: App) {
 
 
                 const token = jwt.sign({filePath: zipFileName}, KEY, {expiresIn: '1h'});
-                const temporaryLink = `${req.protocol}://${req.get('host')}/download/${token}`;
+                const temporaryLink = `${process.env.FRONTEND_URL}/download/${token}`;
                 const response = res.status(201).json({status: "SUCCESS", message: 'Fichier uploadé et compressé avec succès', link: temporaryLink});
             }
         } catch (error) {
@@ -147,20 +146,25 @@ export function getFilesRoutes(app: App) {
         }
     })
 
-    router.get('/upload/:token', async (req: Request, res: Response): Promise<void> => {
+    router.get('/download/:token', async (req: Request, res: Response): Promise<void> => {
 
         try {
             const {token} = req.params;
-            console.log(token);
+            console.log('token', token);
 
             const decoded = jwt.verify(token, KEY) as { filePath: string };
             const zipFilePath = path.join(__dirname, 'uploads', decoded.filePath);
+            console.log('zipFilePath', zipFilePath);
 
             if (!fs.existsSync(zipFilePath)) {
                 res.status(404).json({message: 'Fichier non trouvé'});
             }
 
-            res.download(zipFilePath);
+            res.download(zipFilePath, decoded.filePath, (err) => {
+                if (err) {
+                    res.status(500).json({ message: "Erreur lors du téléchargement du fichier" });
+                }
+            });
         } catch (error) {
             res.status(403).json({message: 'Lien expiré ou non autorisé'});
         }

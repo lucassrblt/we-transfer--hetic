@@ -1,6 +1,6 @@
 import {API_Url} from "@/constants/ApiUrl.tsx";
 
-export default async function sendFile(mailObject, file,user){
+export async function sendFile(mailObject, file, user){
     try {
         const formData = new FormData()
         const token = localStorage.getItem('token');
@@ -29,3 +29,30 @@ export default async function sendFile(mailObject, file,user){
     }
 
 }
+
+
+export async function downloadFile(token: string){
+        const authToken = localStorage.getItem('token');
+        const response = await fetch(API_Url + "/files/download/" + token, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${authToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = "yourfile.zip";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+    return {status: "SUCCESS"};
+}
+

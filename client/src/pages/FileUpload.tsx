@@ -17,8 +17,8 @@ import {
 import {HiUpload} from "react-icons/hi";
 import {toaster, Toaster} from "@/components/ui/toaster";
 import {BiTransferAlt} from "react-icons/bi";
-import sendFile from '../functions/sendFile.ts'
 import {useAuth} from "@/context/AuthContext.tsx";
+import {sendFile} from "@/functions/files.ts";
 
 const FileUpload = () => {
     const [email, setEmail] = useState("");
