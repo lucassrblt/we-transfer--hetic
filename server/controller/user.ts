@@ -26,6 +26,7 @@ interface User{
 
 }
 
+
 interface LoginRequest extends Request {
     body: {
         email: string;
@@ -36,12 +37,43 @@ interface LoginRequest extends Request {
 
 export async function signup(req: SignupRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+        const checkUser = await cursor.execute<mysql.RowDataPacket[]>(`SELECT * FROM users WHERE email = ?`, [req.body.email]); 
+        if(!req.body.email || !req.body.password || !req.body.nom || !req.body.prenom){
+            res.status(400).json({ message: 'Please fill all the fields' });
+            return
+        }
+        if (checkUser[0].length > 0) {
+            res.status(409).json({ message: 'User already exists' });
+            return
+        }
+        if(req.body.password.length < 8){
+            res.status(400).json({ message: 'Password must be at least 8 characters long' });
+            return
+        }
+        console.log("test");
         const hash = await bcrypt.hash(req.body.password, 10);
         const { email, nom, prenom} = req.body;
         let myuuid = uuidv4();
-        await cursor.execute(`INSERT INTO users (id ,email, nom, prenom, password) VALUES (?, ?, ?, ?, ?)`, [myuuid,email, nom, prenom, hash]);
-        res.status(200).json({message:"User was created"});
+        const response =await cursor.execute<mysql.RowDataPacket[]>(`INSERT INTO users (email, password, nom, prenom, id) VALUES (?, ?, ?, ?, ?)`, [email, hash, nom, prenom, myuuid]);
+        if(response[0].length === 0){
+            res.status(500).json({ message: 'User not created' });
+            return
+        }
+        const getUser = await cursor.execute<mysql.RowDataPacket[]>(`SELECT * FROM users WHERE email = ?`, [email]);
+        res.status(200).json({message:"User was created", data: {
+            email: getUser[0][0].email,
+            name: getUser[0][0].nom,
+            prenom: getUser[0][0].prenom,
+            id: getUser[0][0].id,
+            token: jwt.sign(
+                { userId: getUser[0][0].id },
+                KEY,
+                { expiresIn: '1h' }
+            )
+        }
+    });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error });
     }
 }
@@ -50,6 +82,10 @@ export async function login(req: LoginRequest, res: Response, next: NextFunction
       
     try {
         const { email, password } = req.body;
+        if(!email || !password){
+            res.status(400).json({ message: 'Please fill all the fields' });
+            return
+        }
         
         const [rows] = await cursor.execute<mysql.RowDataPacket[]>(`SELECT * FROM users WHERE email = ?`, [email]);
         const user = rows[0];
@@ -62,9 +98,10 @@ export async function login(req: LoginRequest, res: Response, next: NextFunction
             } else {
 
                 res.status(201).json({
-                    usernom: user.nom,
-                    userprenom: user.prenom,
-                    useremail: user.email,
+                    id: user.id,
+                    name: user.nom,
+                    prenom: user.prenom,
+                    email: user.email,
                     token: jwt.sign(
                         { userId: user.id },
                         KEY,
