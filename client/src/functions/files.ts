@@ -39,9 +39,10 @@ export async function downloadFile(token: string){
                 Authorization: `Bearer ${authToken}`
             }
         });
+        console.log("response", response)
 
         if (!response.ok) {
-            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+            return {status: "Failed", message: response.message};
         }
 
     const blob = await response.blob();

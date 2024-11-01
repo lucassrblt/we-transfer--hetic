@@ -21,6 +21,8 @@ export const DownloadPage: React.FC = () => {
             setTimeout(() => {
                 window.location.href = "/";
             }, 3000)
+        }else{
+            toaster.create({title: "Error when downloading file", description: "Something went wrong with the download"});
         }
     }
 
