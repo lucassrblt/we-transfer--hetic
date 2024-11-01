@@ -12,7 +12,7 @@ export function getMailRepository(database: Pool): MailRepositoryI {
 
             const mailHistoryId = uuidv4()
             const [query]: any = await database.execute(
-                "INSERT INTO mail_history (id, user_id, file_id, receiver, title, message) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO mail_history (id, user_id, file_id, receiver, title, message) VALUES (?, ?, ?, ?, ?, ?)",
                 [mailHistoryId, userId, fileId, mailEntity.email, mailEntity.title, mailEntity.message]
             );
 

@@ -3,7 +3,7 @@ export class SuccessResponse {
 
     send(res: any) {
         res.status(this.statusCode).json({
-            status: 'success',
+            status: this.statusCode || 200, 
             message: this.message
         });
     }

@@ -28,7 +28,7 @@ export type anyType = any
 
 
 export interface FileRepositoryI {
-    getAll: () => Promise<CompleteFileEntityResponse[]>
+    getAll: (userId: uuid) => Promise<CompleteFileEntityResponse[]>
     getOne: (id: uuid) => Promise<CompleteFileEntityResponse>
     insert: (fileEntity: CompleteFileEntityRequest, fileId: uuid) => Promise<>
     update: (uuid: uuid,  fileEntity: CompleteFileEntityRequest) => anyType

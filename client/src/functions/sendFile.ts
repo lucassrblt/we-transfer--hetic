@@ -1,16 +1,20 @@
 import {API_Url} from "@/constants/ApiUrl.tsx";
 
-export default async function sendFile(mailObject, file){
+export default async function sendFile(mailObject, file,user){
     try {
         const formData = new FormData()
+        const token = localStorage.getItem('token');
         formData.append('mailData', JSON.stringify(mailObject));
         formData.append('file', file);
         formData.append('metadata', JSON.stringify({ name: file.name, size: file.size }));
-        formData.append('filedata', JSON.stringify({ userId: "1"}))
+        formData.append('filedata', JSON.stringify({ userId: user.id }));
 
         const response = await fetch(API_Url + "/files/upload", {
             method: "POST",
-            body: formData
+            body: formData,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         })
 
         if(!response.ok){

@@ -50,7 +50,7 @@ export async function signup(req: SignupRequest, res: Response, next: NextFuncti
             res.status(400).json({ message: 'Password must be at least 8 characters long' });
             return
         }
-        console.log("test");
+
         const hash = await bcrypt.hash(req.body.password, 10);
         const { email, nom, prenom} = req.body;
         let myuuid = uuidv4();

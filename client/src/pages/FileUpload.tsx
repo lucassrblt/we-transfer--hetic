@@ -18,12 +18,14 @@ import { HiUpload } from "react-icons/hi";
 import { toaster,Toaster} from "@/components/ui/toaster";
 import { BiTransferAlt } from "react-icons/bi";
 import sendFile from '../functions/sendFile.ts'
+import { useAuth } from "@/context/AuthContext.tsx";
 
 const FileUpload = () => {
   const [email, setEmail] = useState("");
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState("");
+  const { user } = useAuth();
 
 
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +46,7 @@ const FileUpload = () => {
       title,
       message
     }
-    await sendFile(transferObject, file)
+    await sendFile(transferObject, file, user);
   }
 
   return (

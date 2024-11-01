@@ -11,6 +11,7 @@ interface AuthContextProps {
 }
 
 interface User {
+  id?: string;
   email: string;
   password: string;
   name: string;
@@ -46,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     const data = await response.json();
     if (response.status === 201) {
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(data));
       localStorage.setItem('token', data.token);
       toast.success('Welcome back! '+user.email,{
         position: "bottom-right",
@@ -100,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(data.data);
       //mettre le token dans le local storage
       localStorage.setItem('token', data.data.token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify(data.data));
       navigate('/');
       toast.success('Welcome! '+user.email,{
         position: "bottom-right",

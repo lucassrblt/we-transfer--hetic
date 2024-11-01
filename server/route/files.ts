@@ -30,6 +30,7 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname); // Nom unique basé sur l'horodatage
     }
 });
+
 const upload = multer({storage: storage});
 
 const createZip = (fileName: string, zipName: string): Promise<void> => {
@@ -51,32 +52,64 @@ const createZip = (fileName: string, zipName: string): Promise<void> => {
 
 export function getFilesRoutes(app: App) {
     const router = express.Router()
-
+    async function checker(id: string){
+        const checkIfExist = await app.repository.filesRepository.getOne(id)
+        if(checkIfExist){
+            return {
+                status: true,
+                fileData: checkIfExist
+            }
+        }
+        return {
+            status: false
+        }
+    }
     router.get('', (req, res, next) => {
         const response = res.json('test')
         res.send(response)
     })
-    router.get('/all', (req, res, next) => {
-
-        const response = app.repository.filesRepository.getAll()
+    router.get('/all/:userId', async (req, res, next) => {
+        try{
+        const response = await app.repository.filesRepository.getAll(req.params.userId)
+        console.log(response)
         res.send(response)
+        }
+        catch(e){
+            res.status(500).json({message: "Erreur lors de la récupération des fichiers", error: e})
+        }
     })
 
     router.get('/:id', (req, res, next) => {
+        try{
         const response = app.repository.filesRepository.getOne(req.params.id)
         res.send(response)
+        }
+        catch(e){
+            res.status(500).json({message: "Erreur lors de la récupération du fichier", error: e})
+        }
 
     })
 
-    router.put('/:id', (req, res, next) => {
+    router.put('/:id', async (req, res, next) => {
+        try {
         const data = req.body
-        const response = app.repository.filesRepository.update(req.params.id, data)
-        res.send(response)
+        const response = await app.repository.filesRepository.update(req.params.id, data)
+        res.send(response).status(200)
+        }
+        catch(e){
+            console.log(e)
+            res.status(500).json({message: "Erreur lors de la modification du fichier", error: e})
+        }
     })
 
-    router.delete('/:id', (req, res, next) => {
-        const response = app.repository.filesRepository.delete(req.params.id)
-        res.send(response)
+    router.delete('/:id', async(req, res, next) => {
+        try {
+        const response =await app.repository.filesRepository.delete(req.params.id)
+        res.send(response).status(response.status)
+        }
+        catch(e){
+            res.status(500).json({message: "Erreur lors de la suppression du fichier", error: e})
+        }
     })
 
     router.post('/upload', upload.single('file'), async (req: Request, res: Response): Promise<void> => {
