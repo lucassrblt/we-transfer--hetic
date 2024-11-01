@@ -140,10 +140,10 @@ export function getFilesRoutes(app: App) {
 
                 const token = jwt.sign({filePath: zipFileName}, KEY, {expiresIn: '1h'});
                 const temporaryLink = `${req.protocol}://${req.get('host')}/download/${token}`;
-                const response = res.status(201).json({message: 'Fichier uploadé et compressé avec succès', link: temporaryLink});
+                const response = res.status(201).json({status: "SUCCESS", message: 'Fichier uploadé et compressé avec succès', link: temporaryLink});
             }
         } catch (error) {
-            res.status(500).json({message: 'Erreur lors de l\'upload et de la création du ZIP', error});
+            res.status(500).json({status: "FAIL", message: 'Erreur lors de l\'upload et de la création du ZIP', error});
         }
     })
 
