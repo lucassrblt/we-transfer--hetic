@@ -2,15 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {Button, Group, Input, InputAddon, Stack} from "@chakra-ui/react"
-import { Text } from "@chakra-ui/react";
 import {downloadFile} from "@/functions/files.ts";
 import {toaster, Toaster} from "@/components/ui/toaster";
 
 export const DownloadPage: React.FC = () => {
     const {token} = useParams();
-    const [files, setFiles] = useState<File[]>([]);
+    console.log("token", token)
     const [downloaded, setDownloaded] = useState(false);
-    const [filePath, setFilePath] = useState("");
 
 
     const handleDownload = async () => {
